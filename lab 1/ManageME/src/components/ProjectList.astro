@@ -1,55 +1,14 @@
 ---
-import type { Project } from "../models/Project";
-import { ProjectService } from "../services/ProjectService";
-import { atom } from "nanostores";
-
-const projectsStore = atom<Project[]>([]);
-
-function handleAddProject() {
-    const newProject = {
-        id: Date.now().toString(),
-        name: "New Project",
-        description: "Description",
-    };
-    ProjectService.addProject(newProject);
-    projectsStore.set(ProjectService.getAllProjects());
-}
-
-function handleDeleteProject(id: string) {
-    ProjectService.deleteProject(id);
-    projectsStore.set(ProjectService.getAllProjects());
-}
-
-function handleUpdateProject(updatedProject: Project) {
-    ProjectService.updateProject(updatedProject);
-    projectsStore.set(ProjectService.getAllProjects());
-}
-
-projectsStore.subscribe(() => {
-    // This function will be called whenever the projectsStore value changes
-    // You can update the UI here or perform any other necessary actions
-});
-
-projectsStore.set(ProjectService.getAllProjects());
+import ProjectListComponent from '../components/ProjectList.tsx';
 ---
 
-<div>
-    <h1>Project List</h1>
-    <button onclick={handleAddProject}>Add Project</button>
-    <ul>
-        {
-            projectsStore.value.map((project) => (
-                <li key={project.id}>
-                    <h2>{project.name}</h2>
-                    <p>{project.description}</p>
-                    <button onClick={() => handleDeleteProject(project.id)}>
-                        Delete
-                    </button>
-                    <button onClick={() => handleUpdateProject({...project, name: "Updated Name"})}>
-                        Edit
-                    </button>
-                </li>
-            ))
-        }
-    </ul>
+<div class="container">
+    <div class="row row-cols-1">
+        <div class="col">
+            <h1>Project List</h1>
+        </div>
+        <div class="col">
+            <ProjectListComponent client:load />
+        </div>
+    </div>
 </div>
