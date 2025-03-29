@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Button from "./Button";
 import { ProjectService } from "../services/ProjectService";
 import type { Project } from "../models/Project";
+import { ProjectStateService } from "../services/ProjectStateService";
 
 const ProjectList: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -36,60 +37,66 @@ const ProjectList: React.FC = () => {
 
   return (
     <div>
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <Button onClick={addProject} className="btn btn-primary">
-            Add Project
-          </Button>
-        </div>
-        <ul className="list-group">
-          {isLoading ? (
-            <>
-              <li className="list-group-item placeholder-glow">
-                <div className="d-flex justify-content-between">
-                  <span className="placeholder col-12 placeholder-lg p-4"></span>
-                </div>
-              </li>
-              <li className="list-group-item placeholder-glow">
-                <div className="d-flex justify-content-between">
-                  <span className="placeholder col-12 placeholder-lg p-4"></span>
-                </div>
-              </li>
-              <li className="list-group-item placeholder-glow">
-                <div className="d-flex justify-content-between">
-                  <span className="placeholder col-12 placeholder-lg p-4"></span>
-                </div>
-              </li>
-            </>
-          ) : (
-            projects.map((project) => (
-              <li key={project.id} className="list-group-item mb-2">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div>
-                    <h5 className="mb-1">{project.name}</h5>
-                    <p className="mb-1 text-muted">{project.description}</p>
-                  </div>
-                  <div>
-                    <Button
-                      onClick={() => deleteProject(project.id)}
-                      className="btn btn-danger btn-sm me-2"
-                    >
-                      Delete
-                    </Button>
-                    <Button
-                      onClick={() =>
-                        updateProject({ ...project, name: "Updated Name" })
-                      }
-                      className="btn btn-secondary btn-sm"
-                    >
-                      Edit
-                    </Button>
-                  </div>
-                </div>
-              </li>
-            ))
-          )}
-        </ul>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <Button onClick={addProject} className="btn btn-primary">
+          Add Project
+        </Button>
       </div>
+      <ul className="list-group">
+        {isLoading ? (
+          <>
+            <li className="list-group-item placeholder-glow">
+              <div className="d-flex justify-content-between">
+                <span className="placeholder col-12 placeholder-lg p-4"></span>
+              </div>
+            </li>
+            <li className="list-group-item placeholder-glow">
+              <div className="d-flex justify-content-between">
+                <span className="placeholder col-12 placeholder-lg p-4"></span>
+              </div>
+            </li>
+            <li className="list-group-item placeholder-glow">
+              <div className="d-flex justify-content-between">
+                <span className="placeholder col-12 placeholder-lg p-4"></span>
+              </div>
+            </li>
+          </>
+        ) : (
+          projects.map((project) => (
+            <li key={project.id} className="list-group-item mb-2">
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <h5 className="mb-1">{project.name}</h5>
+                  <p className="mb-1 text-muted">{project.description}</p>
+                </div>
+                <div>
+                  <Button
+                    onClick={() => deleteProject(project.id)}
+                    className="btn btn-danger btn-sm me-2"
+                  >
+                    Delete
+                  </Button>
+                  <Button
+                    onClick={() =>
+                      updateProject({ ...project, name: "Updated Name" })
+                    }
+                    className="btn btn-secondary btn-sm"
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    onClick={() => ProjectStateService.setActiveProject(project)}
+                    className="btn btn-success btn-sm me-2"
+                  >
+                    Set Active
+                  </Button>
+                </div>
+              </div>
+            </li>
+          ))
+        )}
+      </ul>
+    </div>
   );
 };
 
