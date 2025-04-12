@@ -1,5 +1,4 @@
-import type { User } from "./UserService";
-import type { Project } from "../models/Project";
+import { ApiService } from "./ApiService";
 
 export interface Story {
   id: string;
@@ -12,35 +11,35 @@ export interface Story {
   ownerId: string;
 }
 
-const LOCAL_STORAGE_NAME = "manage-me-stories";
+export class StoryService extends ApiService<Story> {
+  private static instance: StoryService = new StoryService();
 
-export const StoryService = class {
-  static getAllStories(): Story[] {
-    const stories = localStorage.getItem(LOCAL_STORAGE_NAME);
-    return stories ? JSON.parse(stories) : [];
+  private constructor() {
+    super("manage-me-stories");
   }
 
+  // Static method to get all stories
+  static getAllStories(): Story[] {
+    return this.instance.getAll();
+  }
+
+  // Static method to get stories by project
   static getStoriesByProject(projectId: string): Story[] {
     return this.getAllStories().filter((story) => story.projectId === projectId);
   }
 
+  // Static method to add a story
   static addStory(story: Story): void {
-    const stories = this.getAllStories();
-    stories.push(story);
-    localStorage.setItem(LOCAL_STORAGE_NAME, JSON.stringify(stories));
+    this.instance.add(story);
   }
 
+  // Static method to update a story
   static updateStory(updatedStory: Story): void {
-    let stories = this.getAllStories();
-    stories = stories.map((story) =>
-      story.id === updatedStory.id ? updatedStory : story
-    );
-    localStorage.setItem(LOCAL_STORAGE_NAME, JSON.stringify(stories));
+    this.instance.update(updatedStory, (story) => story.id === updatedStory.id);
   }
 
+  // Static method to delete a story
   static deleteStory(id: string): void {
-    let stories = this.getAllStories();
-    stories = stories.filter((story) => story.id !== id);
-    localStorage.setItem(LOCAL_STORAGE_NAME, JSON.stringify(stories));
+    this.instance.delete((story) => story.id === id);
   }
-};
+}

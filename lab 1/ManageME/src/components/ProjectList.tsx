@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Button from "./Button";
 import { ProjectService } from "../services/ProjectService";
 import type { Project } from "../models/Project";
-import { ProjectStateService } from "../services/ProjectStateService";
 
 const ProjectList: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -10,7 +9,7 @@ const ProjectList: React.FC = () => {
 
   // Load projects from localStorage on component mount
   useEffect(() => {
-    const storedProjects = ProjectService.getAllProjects();
+    const storedProjects = ProjectService.getAllProjects(); // Directly call static method
     setProjects(storedProjects);
     setIsLoading(false);
   }, []);
@@ -21,17 +20,17 @@ const ProjectList: React.FC = () => {
       name: "New Project",
       description: "Description",
     };
-    ProjectService.addProject(newProject);
+    ProjectService.addProject(newProject); // Directly call static method
     setProjects(ProjectService.getAllProjects());
   };
 
   const deleteProject = (id: string) => {
-    ProjectService.deleteProject(id);
+    ProjectService.deleteProject(id); // Directly call static method
     setProjects(ProjectService.getAllProjects());
   };
 
   const updateProject = (updatedProject: Project) => {
-    ProjectService.updateProject(updatedProject);
+    ProjectService.updateProject(updatedProject); // Directly call static method
     setProjects(ProjectService.getAllProjects());
   };
 
@@ -45,16 +44,6 @@ const ProjectList: React.FC = () => {
       <ul className="list-group">
         {isLoading ? (
           <>
-            <li className="list-group-item placeholder-glow">
-              <div className="d-flex justify-content-between">
-                <span className="placeholder col-12 placeholder-lg p-4"></span>
-              </div>
-            </li>
-            <li className="list-group-item placeholder-glow">
-              <div className="d-flex justify-content-between">
-                <span className="placeholder col-12 placeholder-lg p-4"></span>
-              </div>
-            </li>
             <li className="list-group-item placeholder-glow">
               <div className="d-flex justify-content-between">
                 <span className="placeholder col-12 placeholder-lg p-4"></span>
@@ -85,7 +74,7 @@ const ProjectList: React.FC = () => {
                     Edit
                   </Button>
                   <Button
-                    onClick={() => ProjectStateService.setActiveProject(project)}
+                    onClick={() => ProjectService.setActiveProject(project)}
                     className="btn btn-success btn-sm me-2"
                   >
                     Set Active

@@ -1,6 +1,12 @@
 ---
-import { UserService } from "../services/UserService";
+import { UserService, type User } from "../services/UserService";
+const loggedInUser: User = {
+  id: "1",
+  firstName: "John",
+  lastName: "Doe",
+};
 
+UserService.setLoggedInUser(loggedInUser);
 const user = UserService.getLoggedInUser();
 const links = [
   { href: "/", label: "Home" },
