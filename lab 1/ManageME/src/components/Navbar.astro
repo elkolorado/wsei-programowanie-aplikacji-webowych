@@ -1,13 +1,6 @@
 ---
-import { UserService, type User } from "../services/UserService";
-const loggedInUser: User = {
-  id: "1",
-  firstName: "John",
-  lastName: "Doe",
-};
-
-UserService.setLoggedInUser(loggedInUser);
-const user = UserService.getLoggedInUser();
+// filepath: d:\Users\filip.zielinski.WSEI\wsei-programowanie-aplikacji-webowych\lab 1\ManageME\src\components\Navbar.astro
+import UserProfile from "./UserProfile.tsx";
 const links = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
@@ -39,7 +32,7 @@ const links = [
         ))}
       </ul>
       <span class="navbar-text ms-3">
-        Logged in as: {user.firstName} {user.lastName}
+        <UserProfile client:only/>
       </span>
     </div>
   </div>

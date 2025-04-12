@@ -1,9 +1,12 @@
 import { ApiService } from "./ApiService";
 
+export type UserRole = "admin" | "devops" | "developer";
+
 export interface User {
   id: string;
   firstName: string;
   lastName: string;
+  role: UserRole;
 }
 
 export class UserService extends ApiService<User> {
@@ -53,5 +56,18 @@ export class UserService extends ApiService<User> {
       }
     }
     return this.loggedInUser;
+  }
+
+  // Static method to mock a list of users
+  static mockUsers(): void {
+    const users: User[] = [
+      { id: "1", firstName: "John", lastName: "Doe", role: "admin" },
+      { id: "2", firstName: "Jane", lastName: "Smith", role: "developer" },
+      { id: "3", firstName: "Alice", lastName: "Johnson", role: "devops" },
+    ];
+    this.instance.saveAll(users);
+
+    // Set the logged-in user as the admin
+    this.setLoggedInUser(users[0]);
   }
 }
