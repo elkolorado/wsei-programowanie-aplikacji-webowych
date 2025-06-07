@@ -3,10 +3,12 @@ import { StoryService } from "../services/StoryService";
 import { ProjectService } from "../services/ProjectService";
 import Button from "./Button";
 import type { Story } from "../models/Story";
+import type { Project } from "../models/Project";
 
 const StoryList: React.FC = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [filter, setFilter] = useState<"todo" | "doing" | "done" | "all">("all");
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [newStory, setNewStory] = useState<Partial<Story>>({
     name: "",
     description: "",
@@ -18,6 +20,7 @@ const StoryList: React.FC = () => {
 
   const loadStoriesForActiveProject = () => {
     const activeProject = ProjectService.getActiveProject();
+    setActiveProject(activeProject);
     if (activeProject) {
       setStories(StoryService.getStoriesByProject(activeProject.id));
     } else {
@@ -101,29 +104,54 @@ const StoryList: React.FC = () => {
       ? stories
       : stories.filter((story) => story.state === filter);
 
+  if (!activeProject) {
+    return (
+      <div className="alert alert-warning">
+        Please select a project to view and manage stories.
+      </div>
+    );
+  }
+
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3>Stories</h3>
+      <div className="d-flex justify-content-between align-items-center mb-3 mt-5">
+        <div className="d-flex">
+          <h3>Stories</h3>
+          <Button onClick={() => setShowForm(true)} className="btn btn-primary mb-3 ms-3">
+            {editingStory ? "Edit Story" : "Create New Story"}
+          </Button>
+        </div>
         <div>
-          <Button onClick={() => setFilter("all")} className="btn btn-secondary btn-sm">
-            All
-          </Button>
-          <Button onClick={() => setFilter("todo")} className="btn btn-primary btn-sm">
-            Todo
-          </Button>
-          <Button onClick={() => setFilter("doing")} className="btn btn-warning btn-sm">
-            Doing
-          </Button>
-          <Button onClick={() => setFilter("done")} className="btn btn-success btn-sm">
-            Done
-          </Button>
+          <div className="d-flex gap-2" role="group" aria-label="Story state filter">
+            <Button
+              onClick={() => setFilter("all")}
+              className={`btn btn-sm ${filter === "all" ? "btn-dark" : "btn-outline-secondary"}`}
+            >
+              All
+            </Button>
+            <Button
+              onClick={() => setFilter("todo")}
+              className={`btn btn-sm ${filter === "todo" ? "btn-primary" : "btn-outline-primary"}`}
+            >
+              Todo
+            </Button>
+            <Button
+              onClick={() => setFilter("doing")}
+              className={`btn btn-sm ${filter === "doing" ? "btn-warning" : "btn-outline-warning"}`}
+            >
+              Doing
+            </Button>
+            <Button
+              onClick={() => setFilter("done")}
+              className={`btn btn-sm ${filter === "done" ? "btn-success" : "btn-outline-success"}`}
+            >
+              Done
+            </Button>
+          </div>
         </div>
       </div>
 
-      <Button onClick={() => setShowForm(true)} className="btn btn-primary mb-3">
-        {editingStory ? "Edit Story" : "Create New Story"}
-      </Button>
+
 
       {showForm && (
         <div className="mb-3">
@@ -180,10 +208,44 @@ const StoryList: React.FC = () => {
 
       <ul className="list-group">
         {filteredStories.map((story) => (
-          <li key={story.id} className="list-group-item">
-            <h5>{story.name}</h5>
-            <p>{story.description}</p>
-            <span className="badge bg-info text-dark">{story.priority}</span>
+          <li key={story.id} className="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+
+              <div className="d-flex align-items-center mb-1">
+                <h5 className="mb-0 me-2">{story.name}</h5>
+                <span
+                  className={`badge ${story.priority === "high"
+                      ? "bg-danger"
+                      : story.priority === "medium"
+                        ? "bg-warning text-dark"
+                        : "bg-info text-dark"
+                    }`}
+                >
+                  {story.priority}
+                </span>
+                <span
+                  className={`ms-2 badge ${story.state === "done"
+                      ? "bg-success"
+                      : story.state === "doing"
+                        ? "bg-warning text-dark"
+                        : "bg-primary"
+                    }`}
+                >
+                  {story.state}
+                </span>
+              </div>
+              <p className="mb-1">{story.description}</p>
+              <div className="d-flex flex-wrap gap-3 text-muted small">
+                <span>
+                  <i className="bi bi-calendar me-1"></i>
+                  Created: {new Date(story.createdAt).toLocaleDateString()}
+                </span>
+                <span>
+                  <i className="bi bi-person me-1"></i>
+                  Owner: {story.ownerId}
+                </span>
+              </div>
+            </div>
             <div className="mt-2">
               <Button
                 onClick={() => handleEditStory(story)}

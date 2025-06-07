@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { TaskService} from "../services/TaskService";
+import { TaskService } from "../services/TaskService";
 import type { Task } from "../models/Task";
 import TaskDetails from "./TaskDetails";
 import AddTaskForm from "./AddTask";
@@ -21,7 +21,7 @@ const KanbanBoard: React.FC = () => {
     setTasks(TaskService.getAllTasks());
   };
 
-  const renderColumn = (state: "todo" | "doing" | "done") => (
+  const renderColumn = (state: Task["state"]) => (
     <div className="kanban-column">
       <h4>{state.toUpperCase()}</h4>
       {tasks
@@ -41,8 +41,8 @@ const KanbanBoard: React.FC = () => {
 
   return (
     <div className="kanban-board">
-        <h2>Kanban Board</h2>
-        <AddTaskForm />
+      <h2>Kanban Board</h2>
+      <AddTaskForm />
       {selectedTask && (
         <TaskDetails task={selectedTask} onClose={handleCloseDetails} />
       )}

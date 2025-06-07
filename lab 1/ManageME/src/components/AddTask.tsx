@@ -14,13 +14,13 @@ const AddTaskForm: React.FC = () => {
     e.preventDefault();
 
     const newTask: Task = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       name: task.name || "Untitled Task",
       description: task.description || "",
-      priority: task.priority as "low" | "medium" | "high",
+      priority: task.priority as Task["priority"],
       storyId: task.storyId || "default-story-id", // Replace with actual story ID
       estimatedHours: task.estimatedHours || 0,
-      state: "todo",
+      state: "todo" as Task["state"],
       createdAt: new Date().toISOString(),
     };
 
@@ -50,7 +50,7 @@ const AddTaskForm: React.FC = () => {
         <label>Priority:</label>
         <select
           value={task.priority}
-          onChange={(e) => setTask({ ...task, priority: e.target.value as "low" | "medium" | "high" })}
+          onChange={(e) => setTask({ ...task, priority: e.target.value as Task["priority"] })}
         >
           <option value="low">Low</option>
           <option value="medium">Medium</option>

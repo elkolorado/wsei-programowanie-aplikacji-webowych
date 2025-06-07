@@ -6,11 +6,14 @@ import type { Project } from "../models/Project";
 const ProjectList: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
 
-  // Load projects from localStorage on component mount
   useEffect(() => {
-    const storedProjects = ProjectService.getAllProjects(); // Directly call static method
+    const storedProjects = ProjectService.getAllProjects();
     setProjects(storedProjects);
+    // Try to get active project from service/localStorage
+    const active = ProjectService.getActiveProject?.();
+    setActiveProjectId(active?.id ?? null);
     setIsLoading(false);
   }, []);
 
@@ -20,18 +23,24 @@ const ProjectList: React.FC = () => {
       name: "New Project",
       description: "Description",
     };
-    ProjectService.addProject(newProject); // Directly call static method
+    ProjectService.addProject(newProject);
     setProjects(ProjectService.getAllProjects());
   };
 
   const deleteProject = (id: string) => {
-    ProjectService.deleteProject(id); // Directly call static method
+    ProjectService.deleteProject(id);
     setProjects(ProjectService.getAllProjects());
+    if (activeProjectId === id) setActiveProjectId(null);
   };
 
   const updateProject = (updatedProject: Project) => {
-    ProjectService.updateProject(updatedProject); // Directly call static method
+    ProjectService.updateProject(updatedProject);
     setProjects(ProjectService.getAllProjects());
+  };
+
+  const handleSetActive = (project: Project) => {
+    ProjectService.setActiveProject(project);
+    setActiveProjectId(project.id);
   };
 
   return (
@@ -52,7 +61,11 @@ const ProjectList: React.FC = () => {
           </>
         ) : (
           projects.map((project) => (
-            <li key={project.id} className="list-group-item mb-2">
+            <li
+              key={project.id}
+              className={`list-group-item mb-2${activeProjectId === project.id ? " border-primary border-3" : ""}`}
+              style={activeProjectId === project.id ? { border: "2px solid #0d6efd" } : {}}
+            >
               <div className="d-flex justify-content-between align-items-center">
                 <div>
                   <h5 className="mb-1">{project.name}</h5>
@@ -74,7 +87,7 @@ const ProjectList: React.FC = () => {
                     Edit
                   </Button>
                   <Button
-                    onClick={() => ProjectService.setActiveProject(project)}
+                    onClick={() => handleSetActive(project)}
                     className="btn btn-success btn-sm me-2"
                   >
                     Set Active
