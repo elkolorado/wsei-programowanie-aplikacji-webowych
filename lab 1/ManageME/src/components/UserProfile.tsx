@@ -1,5 +1,6 @@
 import React from "react";
-import { UserService, type User } from "../services/UserService";
+import { UserService } from "../services/UserService";
+import type { User } from "../models/User";
 
 // Mock users and set the logged-in user
 UserService.mockUsers();

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TaskService} from "../services/TaskService";
-import type { Task } from "../services/TaskService";
+import type { Task } from "../models/Task";
 const AddTaskForm: React.FC = () => {
   const [task, setTask] = useState<Partial<Task>>({
     name: "",

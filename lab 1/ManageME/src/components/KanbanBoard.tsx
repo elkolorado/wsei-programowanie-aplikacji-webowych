@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TaskService} from "../services/TaskService";
-import type { Task } from "../services/TaskService";
+import type { Task } from "../models/Task";
 import TaskDetails from "./TaskDetails";
 import AddTaskForm from "./AddTask";
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { StoryService } from "../services/StoryService";
-import type { Story } from "../services/StoryService";
 import { ProjectService } from "../services/ProjectService";
 import Button from "./Button";
+import type { Story } from "../models/Story";
 
 const StoryList: React.FC = () => {
   const [stories, setStories] = useState<Story[]>([]);

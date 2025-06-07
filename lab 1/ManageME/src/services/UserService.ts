@@ -1,13 +1,5 @@
+import type { User } from "../models/User";
 import { ApiService } from "./ApiService";
-
-export type UserRole = "admin" | "devops" | "developer";
-
-export interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  role: UserRole;
-}
 
 export class UserService extends ApiService<User> {
   private static instance: UserService = new UserService();

@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { TaskService} from "../services/TaskService";
-import type { Task } from "../services/TaskService";
 import { UserService} from "../services/UserService";
-import type { User } from "../services/UserService";
 import { StoryService } from "../services/StoryService";
 import Button from "./Button";
+import type { Task } from "../models/Task";
 
 interface TaskDetailsProps {
   task: Task;
