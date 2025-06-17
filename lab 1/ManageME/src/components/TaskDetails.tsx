@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { TaskService} from "../services/TaskService";
-import { UserService} from "../services/UserService";
+import { TaskService } from "../services/TaskService";
+import { UserService } from "../services/UserService";
 import { StoryService } from "../services/StoryService";
 import Button from "./Button";
 import type { Task } from "../models/Task";
@@ -39,35 +39,61 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
     };
     TaskService.updateTask(updatedTask);
     setState("done");
+    onClose(); // Close the details view after marking as done
+  };
+
+  const handleDeleteTask = () => {
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      TaskService.deleteTask(task.id);
+      onClose(); // Close the details view after deletion
+    }
   };
 
   const story = StoryService.getAllStories().find((s) => s.id === task.storyId);
 
   return (
-    <div className="task-details">
-      <h3>Task Details</h3>
-      <p><strong>Name:</strong> {task.name}</p>
-      <p><strong>Description:</strong> {task.description}</p>
-      <p><strong>Priority:</strong> {task.priority}</p>
-      <p><strong>Story:</strong> {story?.name || "N/A"}</p>
-      <p><strong>Estimated Hours:</strong> {task.estimatedHours}</p>
-      <p><strong>State:</strong> {state}</p>
-      <p><strong>Start Date:</strong> {task.startDate || "Not started"}</p>
-      <p><strong>End Date:</strong> {task.endDate || "Not completed"}</p>
-      <p>
-        <strong>Assigned User:</strong>{" "}
-        {task.assignedUserId
-          ? UserService.getAllUsers().find((u) => u.id === task.assignedUserId)?.firstName
-          : "Not assigned"}
-      </p>
+    <div className="">
+      <h3 className="card-title mb-3">Task Details</h3>
+      <ul className="list-group list-group-flush mb-3">
+        <li className="list-group-item">
+          <strong>Name:</strong> {task.name}
+        </li>
+        <li className="list-group-item">
+          <strong>Description:</strong> {task.description}
+        </li>
+        <li className="list-group-item">
+          <strong>Priority:</strong> {task.priority}
+        </li>
+        <li className="list-group-item">
+          <strong>Story:</strong> {story?.name || "N/A"}
+        </li>
+        <li className="list-group-item">
+          <strong>Estimated Hours:</strong> {task.estimatedHours}
+        </li>
+        <li className="list-group-item">
+          <strong>State:</strong> <span className={`badge bg-${state === "done" ? "success" : state === "doing" ? "primary" : "secondary"}`}>{state}</span>
+        </li>
+        <li className="list-group-item">
+          <strong>Start Date:</strong> {task.startDate || <span className="text-muted">Not started</span>}
+        </li>
+        <li className="list-group-item">
+          <strong>End Date:</strong> {task.endDate || <span className="text-muted">Not completed</span>}
+        </li>
+        <li className="list-group-item">
+          <strong>Assigned User:</strong>{" "}
+          {task.assignedUserId
+            ? UserService.getAllUsers().find((u) => u.id === task.assignedUserId)?.firstName
+            : <span className="text-muted">Not assigned</span>}
+        </li>
+      </ul>
 
       {state === "todo" && (
-        <div>
-          <label>Assign User:</label>
+        <div className="mb-3">
+          <label className="form-label">Assign User:</label>
           <select
             value={assignedUserId}
             onChange={(e) => setAssignedUserId(e.target.value)}
-            className="form-select"
+            className="form-select mb-2"
           >
             <option value="">Select a user</option>
             {users.map((user) => (
@@ -76,20 +102,20 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
               </option>
             ))}
           </select>
-          <Button onClick={handleAssignUser} className="btn btn-primary mt-2">
+          <Button onClick={handleAssignUser} className="btn btn-primary w-100">
             Assign User
           </Button>
         </div>
       )}
 
       {state === "doing" && (
-        <Button onClick={handleMarkAsDone} className="btn btn-success mt-2">
+        <Button onClick={handleMarkAsDone} className="btn btn-success w-100 mb-2">
           Mark as Done
         </Button>
       )}
 
-      <Button onClick={onClose} className="btn btn-secondary mt-2">
-        Close
+      <Button onClick={handleDeleteTask} className="btn btn-danger w-100 mb-2">
+        Delete Task
       </Button>
     </div>
   );

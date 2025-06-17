@@ -4,12 +4,13 @@ import { ProjectService } from "../services/ProjectService";
 import Button from "./Button";
 import type { Story } from "../models/Story";
 import type { Project } from "../models/Project";
+import Modal from "./Modal";
 
 const StoryList: React.FC = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [filter, setFilter] = useState<"todo" | "doing" | "done" | "all">("all");
   const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [newStory, setNewStory] = useState<Partial<Story>>({
+  const [storyDetails, setNewStory] = useState<Partial<Story>>({
     name: "",
     description: "",
     priority: "low",
@@ -53,22 +54,22 @@ const StoryList: React.FC = () => {
       // Update existing story
       const updatedStory: Story = {
         ...editingStory,
-        name: newStory.name || editingStory.name,
-        description: newStory.description || editingStory.description,
-        priority: newStory.priority as "low" | "medium" | "high",
-        state: newStory.state as "todo" | "doing" | "done",
+        name: storyDetails.name || editingStory.name,
+        description: storyDetails.description || editingStory.description,
+        priority: storyDetails.priority as "low" | "medium" | "high",
+        state: storyDetails.state as "todo" | "doing" | "done",
       };
       StoryService.updateStory(updatedStory);
     } else {
       // Create new story
       const story: Story = {
         id: Date.now().toString(),
-        name: newStory.name || "Untitled Story",
-        description: newStory.description || "",
-        priority: newStory.priority as "low" | "medium" | "high",
+        name: storyDetails.name || "Untitled Story",
+        description: storyDetails.description || "",
+        priority: storyDetails.priority as "low" | "medium" | "high",
         projectId: activeProject.id,
         createdAt: new Date().toISOString(),
-        state: newStory.state as "todo" | "doing" | "done",
+        state: storyDetails.state as "todo" | "doing" | "done",
         ownerId: "1", // Mocked owner ID
       };
       StoryService.addStory(story);
@@ -118,7 +119,7 @@ const StoryList: React.FC = () => {
         <div className="d-flex">
           <h3>Stories</h3>
           <Button onClick={() => setShowForm(true)} className="btn btn-primary mb-3 ms-3">
-            {editingStory ? "Edit Story" : "Create New Story"}
+            Create New Story
           </Button>
         </div>
         <div>
@@ -151,9 +152,14 @@ const StoryList: React.FC = () => {
         </div>
       </div>
 
-
-
-      {showForm && (
+      <Modal
+        openModal={showForm}
+        closeModal={() => {
+          setShowForm(false)
+          setEditingStory(null)
+          setNewStory({ name: "", description: "", priority: "low", state: "todo" });
+        }}
+      >
         <div className="mb-3">
           <h4>{editingStory ? "Edit Story" : "Create New Story"}</h4>
           <div className="mb-2">
@@ -161,24 +167,24 @@ const StoryList: React.FC = () => {
             <input
               type="text"
               className="form-control"
-              value={newStory.name}
-              onChange={(e) => setNewStory({ ...newStory, name: e.target.value })}
+              value={storyDetails.name}
+              onChange={(e) => setNewStory({ ...storyDetails, name: e.target.value })}
             />
           </div>
           <div className="mb-2">
             <label>Description</label>
             <textarea
               className="form-control"
-              value={newStory.description}
-              onChange={(e) => setNewStory({ ...newStory, description: e.target.value })}
+              value={storyDetails.description}
+              onChange={(e) => setNewStory({ ...storyDetails, description: e.target.value })}
             />
           </div>
           <div className="mb-2">
             <label>Priority</label>
             <select
               className="form-select"
-              value={newStory.priority}
-              onChange={(e) => setNewStory({ ...newStory, priority: e.target.value as "low" | "medium" | "high" })}
+              value={storyDetails.priority}
+              onChange={(e) => setNewStory({ ...storyDetails, priority: e.target.value as "low" | "medium" | "high" })}
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -189,22 +195,20 @@ const StoryList: React.FC = () => {
             <label>State</label>
             <select
               className="form-select"
-              value={newStory.state}
-              onChange={(e) => setNewStory({ ...newStory, state: e.target.value as "todo" | "doing" | "done" })}
+              value={storyDetails.state}
+              onChange={(e) => setNewStory({ ...storyDetails, state: e.target.value as "todo" | "doing" | "done" })}
             >
               <option value="todo">Todo</option>
               <option value="doing">Doing</option>
               <option value="done">Done</option>
             </select>
           </div>
-          <Button onClick={handleCreateOrUpdateStory} className="btn btn-success me-2">
+          <Button onClick={handleCreateOrUpdateStory} className="btn btn-primary me-2 w-100">
             Save
           </Button>
-          <Button onClick={() => setShowForm(false)} className="btn btn-secondary">
-            Cancel
-          </Button>
         </div>
-      )}
+      </Modal>
+
 
       <ul className="list-group">
         {filteredStories.map((story) => (
@@ -215,20 +219,20 @@ const StoryList: React.FC = () => {
                 <h5 className="mb-0 me-2">{story.name}</h5>
                 <span
                   className={`badge ${story.priority === "high"
-                      ? "bg-danger"
-                      : story.priority === "medium"
-                        ? "bg-warning text-dark"
-                        : "bg-info text-dark"
+                    ? "bg-danger"
+                    : story.priority === "medium"
+                      ? "bg-warning text-dark"
+                      : "bg-info text-dark"
                     }`}
                 >
                   {story.priority}
                 </span>
                 <span
                   className={`ms-2 badge ${story.state === "done"
-                      ? "bg-success"
-                      : story.state === "doing"
-                        ? "bg-warning text-dark"
-                        : "bg-primary"
+                    ? "bg-success"
+                    : story.state === "doing"
+                      ? "bg-warning text-dark"
+                      : "bg-primary"
                     }`}
                 >
                   {story.state}

@@ -10,4 +10,5 @@ export interface Task {
   startDate?: string; // Populated when state changes to "doing"
   endDate?: string; // Populated when state changes to "done"
   assignedUserId?: string; // User responsible for the task
+  projectId: string; // Associated project
 }
