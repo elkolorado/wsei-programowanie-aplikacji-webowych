@@ -15,6 +15,15 @@ const ProjectList: React.FC = () => {
     const active = ProjectService.getActiveProject?.();
     setActiveProjectId(active?.id ?? null);
     setIsLoading(false);
+
+    // Subscribe to project changes
+    const handleProjectChange = () => {
+      const updatedProjects = ProjectService.getAllProjects();
+      setProjects(updatedProjects);
+      const activeProject = ProjectService.getActiveProject();
+      setActiveProjectId(activeProject?.id ?? null);
+    }
+    ProjectService.subscribe(handleProjectChange);
   }, []);
 
   const addProject = () => {
@@ -24,23 +33,19 @@ const ProjectList: React.FC = () => {
       description: "Description",
     };
     ProjectService.addProject(newProject);
-    setProjects(ProjectService.getAllProjects());
   };
 
   const deleteProject = (id: string) => {
     ProjectService.deleteProject(id);
-    setProjects(ProjectService.getAllProjects());
     if (activeProjectId === id) setActiveProjectId(null);
   };
 
   const updateProject = (updatedProject: Project) => {
     ProjectService.updateProject(updatedProject);
-    setProjects(ProjectService.getAllProjects());
   };
 
   const handleSetActive = (project: Project) => {
     ProjectService.setActiveProject(project);
-    setActiveProjectId(project.id);
   };
 
   return (

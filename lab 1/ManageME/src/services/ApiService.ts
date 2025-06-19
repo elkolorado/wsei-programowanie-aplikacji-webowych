@@ -10,6 +10,13 @@ export abstract class ApiService<T> {
       const data = localStorage.getItem(this.storageKey);
       return data ? JSON.parse(data) : [];
     }
+
+    // Get a single item by its ID
+    protected getById(id: string): T | null {
+      const items = this.getAll();
+      const found = items.find((item: any) => item.id === id);
+      return found !== undefined ? found : null;
+    }
   
     // Save all items to localStorage
     protected saveAll(items: T[]): void {

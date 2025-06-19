@@ -5,6 +5,7 @@ import Button from "./Button";
 import type { Story } from "../models/Story";
 import type { Project } from "../models/Project";
 import Modal from "./Modal";
+import { UserService } from "../services/UserService";
 
 const StoryList: React.FC = () => {
   const [stories, setStories] = useState<Story[]>([]);
@@ -70,7 +71,7 @@ const StoryList: React.FC = () => {
         projectId: activeProject.id,
         createdAt: new Date().toISOString(),
         state: storyDetails.state as "todo" | "doing" | "done",
-        ownerId: "1", // Mocked owner ID
+        ownerId: UserService.getLoggedInUser()?.id || "default-user-id",
       };
       StoryService.addStory(story);
     }
@@ -246,7 +247,7 @@ const StoryList: React.FC = () => {
                 </span>
                 <span>
                   <i className="bi bi-person me-1"></i>
-                  Owner: {story.ownerId}
+                  Owner: {UserService.getUserById(story.ownerId)?.firstName || "Unknown"}
                 </span>
               </div>
             </div>

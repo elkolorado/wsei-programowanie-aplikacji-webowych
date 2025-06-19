@@ -25,10 +25,25 @@ const AddTaskForm: React.FC = () => {
 
     // subscribe to story changes
     const handleStoryChange = () => {
-      const updatedStories = StoryService.getStoriesByProject(activeProject?.id || "");
-      setStories(updatedStories.map(s => ({ id: s.id, name: s.name })));
+      const currentProject = ProjectService.getActiveProject();
+      if (currentProject) {
+        const updatedStories = StoryService.getStoriesByProject(currentProject.id);
+        setStories(updatedStories.map(s => ({ id: s.id, name: s.name })));
+      } else {
+        setStories([]);
+      }
     };
     StoryService.subscribe(handleStoryChange);
+
+    // subscribe to task changes
+    const handleTaskChange = () => {
+      const updatedTasks = TaskService.getAllTasks();
+      setTask(prev => ({
+        ...prev,
+        storyId: updatedTasks.find(t => t.storyId === prev.storyId)?.storyId || "",
+      }));
+    };
+    TaskService.subscribe(handleTaskChange);
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -47,7 +62,6 @@ const AddTaskForm: React.FC = () => {
     };
 
     TaskService.addTask(newTask);
-    alert("Task added successfully!");
     setTask({ name: "", description: "", priority: "low", storyId: "", estimatedHours: 0 });
   };
 

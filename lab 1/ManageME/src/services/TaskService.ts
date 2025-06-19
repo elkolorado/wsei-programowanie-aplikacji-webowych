@@ -5,7 +5,7 @@ import { ApiService } from "./ApiService";
 
 export class TaskService extends ApiService<Task> {
   private static instance: TaskService = new TaskService();
-    private static listeners: ((project: TaskService | null) => void)[] = [];
+  private static listeners: ((project: TaskService | null) => void)[] = [];
 
   private constructor() {
     super("manage-me-tasks");
@@ -29,16 +29,21 @@ export class TaskService extends ApiService<Task> {
   // Static method to add a task
   static addTask(task: Task): void {
     this.instance.add(task);
+    this.notifyListeners();
   }
 
   // Static method to update a task
   static updateTask(updatedTask: Task): void {
     this.instance.update(updatedTask, (task) => task.id === updatedTask.id);
+    this.notifyListeners();
+
   }
 
   // Static method to delete a task
   static deleteTask(id: string): void {
     this.instance.delete((task) => task.id === id);
+    this.notifyListeners();
+
   }
 
   // Subscribe to changes in the task service
@@ -56,5 +61,5 @@ export class TaskService extends ApiService<Task> {
     this.listeners.forEach((listener) => listener(this.instance));
   }
 
-  
+
 }

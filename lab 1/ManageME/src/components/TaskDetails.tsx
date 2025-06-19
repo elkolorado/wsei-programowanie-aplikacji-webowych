@@ -13,7 +13,8 @@ interface TaskDetailsProps {
 const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
   const [assignedUserId, setAssignedUserId] = useState(task.assignedUserId || "");
   const [state, setState] = useState(task.state);
-
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTask, setEditTask] = useState<Partial<Task>>(task);
   const users = UserService.getAllUsers().filter(
     (user) => user.role === "developer" || user.role === "devops"
   );
@@ -29,6 +30,18 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
     };
     TaskService.updateTask(updatedTask);
     setState("doing");
+    onClose();
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const updatedTask: Task = {
+      ...task,
+      ...editTask,
+    };
+    TaskService.updateTask(updatedTask);
+    setIsEditing(false);
+    
   };
 
   const handleMarkAsDone = () => {
@@ -50,6 +63,103 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
   };
 
   const story = StoryService.getAllStories().find((s) => s.id === task.storyId);
+
+  if (isEditing) {
+    return (
+      <form onSubmit={handleEditSubmit}>
+        <h3 className="card-title mb-3">Edit Task</h3>
+        <div className="mb-2">
+          <label>Name:</label>
+          <input
+            type="text"
+            className="form-control"
+            value={editTask.name}
+            onChange={e => setEditTask({ ...editTask, name: e.target.value })}
+            required
+          />
+        </div>
+        <div className="mb-2">
+          <label>Description:</label>
+          <textarea
+            className="form-control"
+            value={editTask.description}
+            onChange={e => setEditTask({ ...editTask, description: e.target.value })}
+          />
+        </div>
+        <div className="mb-2">
+          <label>Priority:</label>
+          <select
+            className="form-select"
+            value={editTask.priority}
+            onChange={e => setEditTask({ ...editTask, priority: e.target.value as Task["priority"] })}
+          >
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div className="mb-2">
+          <label>Story:</label>
+          <select
+            className="form-select"
+            value={editTask.storyId}
+            onChange={e => setEditTask({ ...editTask, storyId: e.target.value })}
+          >
+            <option value="">Select a story</option>
+            {StoryService.getAllStories().map(story => (
+              <option key={story.id} value={story.id}>
+                {story.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+
+        <div className="mb-2">
+          <label>Estimated Hours:</label>
+          <input
+            type="number"
+            className="form-control"
+            value={editTask.estimatedHours}
+            onChange={e => setEditTask({ ...editTask, estimatedHours: parseInt(e.target.value, 10) })}
+            min={0}
+          />
+        </div>
+        <div className="mb-2">
+          <label>State:</label>
+          <select
+            className="form-select"
+            value={state}
+            onChange={e => setEditTask({ ...editTask, state: e.target.value as Task["state"] })}
+          >
+            <option value="todo">Todo</option>
+            <option value="doing">Doing</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+        <div className="mb-2">
+          <label>Start Date:</label>
+          <input
+            type="datetime-local"
+            className="form-control"
+            value={editTask.startDate || ""}
+            onChange={e => setEditTask({ ...editTask, startDate: e.target.value })}
+          />
+        </div>
+        <div className="mb-2">
+          <label>End Date:</label>
+          <input
+            type="datetime-local"
+            className="form-control"
+            value={editTask.endDate || ""}
+            onChange={e => setEditTask({ ...editTask, endDate: e.target.value })}
+          />
+        </div>
+        <button type="submit" className="btn btn-success w-100 mb-2">Save</button>
+        <Button onClick={() => setIsEditing(false)} className="btn btn-secondary w-100 mb-2">Cancel</Button>
+      </form>
+    );
+  }
 
   return (
     <div className="">
@@ -114,6 +224,9 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
         </Button>
       )}
 
+      <Button onClick={() => setIsEditing(true)} className="btn btn-secondary w-100 mb-2">
+        Edit Task
+      </Button>
       <Button onClick={handleDeleteTask} className="btn btn-danger w-100 mb-2">
         Delete Task
       </Button>

@@ -14,6 +14,12 @@ export class UserService extends ApiService<User> {
     return this.instance.getAll();
   }
 
+  // Static method to get a user by ID
+  static getUserById(id: string): User | null {
+    return this.instance.getById(id);
+  }
+
+
   // Static method to add a user
   static addUser(user: User): void {
     this.instance.add(user);

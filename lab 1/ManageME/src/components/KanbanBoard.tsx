@@ -5,6 +5,8 @@ import TaskDetails from "./TaskDetails";
 import AddTaskForm from "./AddTask";
 import Modal from "./Modal";
 import { ProjectService } from "../services/ProjectService";
+import { UserService } from "../services/UserService";
+import TaskCard from "./TaskCard";
 
 const KanbanBoard: React.FC = () => {
   const [modal, setModal] = useState(false);
@@ -61,6 +63,10 @@ const KanbanBoard: React.FC = () => {
     }
   };
 
+  const handleTaskCardDragStart = (e: React.DragEvent<HTMLDivElement>, taskId: string) => {
+    e.dataTransfer.setData("text/plain", taskId);
+  };
+
   const renderColumn = (state: Task["state"]) => (
     <div className="kanban-column card flex-grow-1 mx-2" onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => handleDrop(e, state)}>
@@ -79,28 +85,20 @@ const KanbanBoard: React.FC = () => {
       <div className="card-body p-2">
         {tasks
           .filter((task) => task.state === state)
-          .map((task) => (
-            <div
-              draggable
-              onDragStart={(e) => e.dataTransfer.setData("text/plain", task.id)}
-              key={task.id}
-              className={`kanban-task card mb-2 shadow-sm cursor-pointer ${task.state === "todo"
-                ? "border-primary"
-                : task.state === "doing"
-                  ? "border-warning"
-                  : task.state === "done"
-                    ? "border-success"
-                    : ""
-                }`}
-              onClick={() => handleTaskClick(task)}
-              style={{ cursor: "pointer" }}
-            >
-              <div className="card-body p-2">
-                <h5 className="card-title mb-1">{task.name}</h5>
-                <p className="card-text small mb-0">{task.description}</p>
-              </div>
-            </div>
-          ))}
+          .map((task) => {
+            const user = task.assignedUserId
+              ? UserService.getAllUsers().find(u => u.id === task.assignedUserId)
+              : null;
+            return (
+              <TaskCard
+                key={task.id}
+                task={task}
+                user={user}
+                onClick={handleTaskClick}
+                onDragStart={handleTaskCardDragStart}
+              />
+            );
+          })}
       </div>
     </div>
   );
