@@ -5,4 +5,7 @@ export interface User {
   firstName: string;
   lastName: string;
   role: UserRole;
+  login?: string; // Optional for some operations
+  passwordHash?: string; // Optional for some operations
+  email?: string; // Optional for some operations
 }

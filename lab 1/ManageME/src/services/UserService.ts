@@ -44,16 +44,14 @@ export class UserService extends ApiService<User> {
   }
 
   // Static method to get the logged-in user
-  static getLoggedInUser(): User | null {
-    if (!this.loggedInUser) {
-      if (typeof window !== "undefined" && window.localStorage) {
-        const storedUser = localStorage.getItem("logged-in-user");
-        if (storedUser) {
-          this.loggedInUser = JSON.parse(storedUser);
-        }
-      }
+  static async getLoggedInUser(token: string): Promise<User | null> {
+    try {
+      const res = await fetch("/api/me", { credentials: "include" });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
     }
-    return this.loggedInUser;
   }
 
   // Static method to mock a list of users
@@ -66,6 +64,6 @@ export class UserService extends ApiService<User> {
     this.instance.saveAll(users);
 
     // Set the logged-in user as the admin
-    this.setLoggedInUser(users[0]);
+    // this.setLoggedInUser(users[0]);
   }
 }

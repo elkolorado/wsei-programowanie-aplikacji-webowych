@@ -1,18 +1,31 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-import ProjectList from '../components/ProjectList.astro';
-import StoryList from '../components/StoryList';
-import KanbanBoard from "../components/KanbanBoard";
-import '../styles/styles.css';
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// filepath: lab 1/ManageME/src/pages/index.astro
+import ProjectList from "../components/ProjectList.tsx";
+import StoryList from "../components/StoryList.tsx";
+import KanbanBoard from "../components/KanbanBoard.tsx";
+import Layout from "../layouts/Layout.astro";
+import jwt from "jsonwebtoken";
+const JWT_SECRET = "your_jwt_secret";
+
+// Server-side check
+export const prerender = false;
+const token = Astro.cookies.get("token")?.value;
+console.log("Token:", Astro.cookies.get("token"));
+let isAuthenticated = false;
+if (token) {
+  try {
+    jwt.verify(token, JWT_SECRET);
+    isAuthenticated = true;
+  } catch {
+  }
+}
+if (!isAuthenticated) {
+  return Astro.redirect('/login');
+}
 ---
 
 <Layout>
-	<!-- <Welcome /> -->
-	<ProjectList />
-	<StoryList client:load />
-	<KanbanBoard client:load />
-	<!-- <Test/> -->
+  <ProjectList client:load />
+  <StoryList client:load />
+  <KanbanBoard client:load />
 </Layout>

@@ -1,5 +1,7 @@
 ---
+import { AuthProvider } from "../context/AuthContext";
 import UserProfile from "./UserProfile.tsx";
+import UserProfileIsland from "./UserProfileIsland";
 const links = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
@@ -24,14 +26,18 @@ const links = [
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        {links.map((link) => (
-          <li class="nav-item">
-            <a class="nav-link" href={link.href}>{link.label}</a>
-          </li>
-        ))}
+        {
+          links.map((link) => (
+            <li class="nav-item">
+              <a class="nav-link" href={link.href}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
       </ul>
       <span class="navbar-text ms-3">
-        <UserProfile client:only/>
+        <UserProfileIsland client:load/>
       </span>
     </div>
   </div>

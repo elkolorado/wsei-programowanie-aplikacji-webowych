@@ -1,17 +1,28 @@
 import React from "react";
 import { UserService } from "../services/UserService";
 import type { User } from "../models/User";
-
-// Mock users and set the logged-in user
-UserService.mockUsers();
-const user: User | null = UserService.getLoggedInUser();
+import { useAuth } from "../context/AuthContext";
 
 const UserProfile: React.FC = () => {
+    const [user, setUser] = React.useState<User | null>(null);
+    const { logout } = useAuth();
+
+    React.useEffect(() => {
+        UserService.getLoggedInUser().then(setUser);
+    }, []);
+
+    const handleLogout = () => {
+        logout();
+    };
+
     return (
         <div>
             {user ? (
                 <>
-                    Logged in as: {user.firstName} {user.lastName} ({user.role})
+                    Logged in as: {user.firstName} {user.lastName} ({user.role}){" "}
+                    <button className="btn btn-sm btn-outline-danger ms-2" onClick={handleLogout}>
+                        Logout
+                    </button>
                 </>
             ) : (
                 <>No user is logged in.</>
