@@ -2,16 +2,21 @@ import React, { useState, useEffect } from "react";
 import Button from "./Button";
 import { ProjectService } from "../services/ProjectService";
 import type { Project } from "../models/Project";
+import Modal from "./Modal";
+import NewProjectForm from "./NewProjectForm";
+import EditProjectForm from "./EditProjectForm";
 
 const ProjectList: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
+  const [showNewModal, setShowNewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   useEffect(() => {
     const storedProjects = ProjectService.getAllProjects();
     setProjects(storedProjects);
-    // Try to get active project from service/localStorage
     const active = ProjectService.getActiveProject?.();
     setActiveProjectId(active?.id ?? null);
     setIsLoading(false);
@@ -26,22 +31,9 @@ const ProjectList: React.FC = () => {
     ProjectService.subscribe(handleProjectChange);
   }, []);
 
-  const addProject = () => {
-    const newProject: Project = {
-      id: Date.now().toString(),
-      name: "New Project",
-      description: "Description",
-    };
-    ProjectService.addProject(newProject);
-  };
-
   const deleteProject = (id: string) => {
     ProjectService.deleteProject(id);
     if (activeProjectId === id) setActiveProjectId(null);
-  };
-
-  const updateProject = (updatedProject: Project) => {
-    ProjectService.updateProject(updatedProject);
   };
 
   const handleSetActive = (project: Project) => {
@@ -50,8 +42,21 @@ const ProjectList: React.FC = () => {
 
   return (
     <div>
+
+      <Modal openModal={showNewModal} closeModal={() => setShowNewModal(false)}>
+        <NewProjectForm onSuccess={() => setShowNewModal(false)} />
+      </Modal>
+
+      <Modal openModal={showEditModal} closeModal={() => setShowEditModal(false)}>
+        {editingProject && (
+          <EditProjectForm
+            project={editingProject}
+            onSuccess={() => setShowEditModal(false)}
+          />
+        )}
+      </Modal>
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <Button onClick={addProject} className="btn btn-primary">
+        <Button onClick={() => setShowNewModal(true)} className="btn btn-primary">
           Add Project
         </Button>
       </div>
@@ -84,8 +89,7 @@ const ProjectList: React.FC = () => {
                     Delete
                   </Button>
                   <Button
-                    onClick={() =>
-                      updateProject({ ...project, name: "Updated Name" })
+                    onClick={() => { setEditingProject(project); setShowEditModal(true); }
                     }
                     className="btn btn-secondary btn-sm"
                   >
@@ -103,7 +107,7 @@ const ProjectList: React.FC = () => {
           ))
         )}
       </ul>
-    </div>
+    </div >
   );
 };
 
