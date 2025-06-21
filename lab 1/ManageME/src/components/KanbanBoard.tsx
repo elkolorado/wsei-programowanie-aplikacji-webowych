@@ -7,7 +7,7 @@ import Modal from "./Modal";
 import { ProjectService } from "../services/ProjectService";
 import { UserService } from "../services/UserService";
 import TaskCard from "./TaskCard";
-import { task } from "nanostores";
+import type { User } from "../models/User";
 
 const KanbanBoard: React.FC = () => {
   const [modal, setModal] = useState(false);
@@ -15,40 +15,41 @@ const KanbanBoard: React.FC = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   useEffect(() => {
-    setTasks(TaskService.getAllTasks());
+    const fetchTasks = async () => {
+      setTasks(await TaskService.getAllTasks());
+    };
+    fetchTasks();
 
     // subscribe to task changes
-    const handleTaskChange = () => setTasks(TaskService.getAllTasks());
+    const handleTaskChange = async () => setTasks(await TaskService.getAllTasks());
     TaskService.subscribe(handleTaskChange);
 
-    ProjectService.subscribe(() => {
+    ProjectService.subscribe(async () => {
       const activeProject = ProjectService.getActiveProject();
       if (activeProject) {
-        setTasks(TaskService.getTasksByProject(activeProject.id));
+        setTasks(await TaskService.getTasksByProject(activeProject.id));
       } else {
         setTasks([]);
       }
     });
+
     // Cleanup subscription on unmount
     return () => {
       TaskService.unsubscribe(handleTaskChange);
     };
-
-    // subscribe to active project changes
-
   }, []);
 
   const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
   };
 
-  const handleCloseDetails = () => {
+  const handleCloseDetails = async () => {
     setSelectedTask(null);
-    setTasks(TaskService.getAllTasks());
+    setTasks(await TaskService.getAllTasks());
   };
 
   // Handle drop event to update task state
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>, newState: Task["state"]) => {
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>, newState: Task["state"]) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData("text/plain");
     const task = tasks.find((t) => t.id === taskId);
@@ -70,14 +71,24 @@ const KanbanBoard: React.FC = () => {
               }
               : {}),
       };
-      TaskService.updateTask(updatedTask);
-      setTasks(TaskService.getAllTasks());
+      await TaskService.updateTask(updatedTask);
+      setTasks(await TaskService.getAllTasks());
     }
   };
 
   const handleTaskCardDragStart = (e: React.DragEvent<HTMLDivElement>, taskId: string) => {
     e.dataTransfer.setData("text/plain", taskId);
   };
+
+  const [users, setUsers] = useState<User[]>([]);
+  
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const allUsers: User[] = await UserService.getAllUsers();
+      setUsers(allUsers);
+    };
+    fetchUsers();
+  }, []);
 
   const renderColumn = (state: Task["state"]) => (
     <div className="kanban-column card flex-grow-1 mx-2" onDragOver={(e) => e.preventDefault()}
@@ -99,7 +110,7 @@ const KanbanBoard: React.FC = () => {
           .filter((task) => task.state === state)
           .map((task) => {
             const user = task.assignedUserId
-              ? UserService.getAllUsers().find(u => u.id === task.assignedUserId)
+              ? users.find((u) => u.id === task.assignedUserId)
               : null;
             return (
               <TaskCard
@@ -114,7 +125,6 @@ const KanbanBoard: React.FC = () => {
       </div>
     </div>
   );
-
 
 
   return (

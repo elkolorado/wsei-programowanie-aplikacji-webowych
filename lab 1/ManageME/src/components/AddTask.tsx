@@ -15,19 +15,23 @@ const AddTaskForm: React.FC = () => {
   });
 
   React.useEffect(() => {
-    const activeProject = ProjectService.getActiveProject();
-    if (activeProject) {
-      const projectStories = StoryService.getStoriesByProject(activeProject.id);
-      setStories(projectStories.map(s => ({ id: s.id, name: s.name })));
-    } else {
-      setStories([]);
-    }
+    const fetchStories = async () => {
+      const activeProject = ProjectService.getActiveProject();
+      if (activeProject) {
+        const projectStories = await StoryService.getStoriesByProject(activeProject.id);
+        setStories(projectStories.map(s => ({ id: s.id, name: s.name })));
+      } else {
+        setStories([]);
+      }
+    };
+
+    fetchStories();
 
     // subscribe to story changes
-    const handleStoryChange = () => {
+    const handleStoryChange = async () => {
       const currentProject = ProjectService.getActiveProject();
       if (currentProject) {
-        const updatedStories = StoryService.getStoriesByProject(currentProject.id);
+        const updatedStories = await StoryService.getStoriesByProject(currentProject.id);
         setStories(updatedStories.map(s => ({ id: s.id, name: s.name })));
       } else {
         setStories([]);
@@ -36,8 +40,8 @@ const AddTaskForm: React.FC = () => {
     StoryService.subscribe(handleStoryChange);
 
     // subscribe to task changes
-    const handleTaskChange = () => {
-      const updatedTasks = TaskService.getAllTasks();
+    const handleTaskChange = async () => {
+      const updatedTasks = await TaskService.getAllTasks();
       setTask(prev => ({
         ...prev,
         storyId: updatedTasks.find(t => t.storyId === prev.storyId)?.storyId || "",

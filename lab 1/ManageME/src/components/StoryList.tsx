@@ -19,23 +19,40 @@ const StoryList: React.FC = () => {
   });
   const [editingStory, setEditingStory] = useState<Story | null>(null);
   const [showForm, setShowForm] = useState(false);
-
-  const loadStoriesForActiveProject = () => {
+  const [users, setUsers] = useState<{ [key: string]: { firstName: string } }>({});
+  const loadStoriesForActiveProject = async () => {
     const activeProject = ProjectService.getActiveProject();
     setActiveProject(activeProject);
     if (activeProject) {
-      setStories(StoryService.getStoriesByProject(activeProject.id));
+      // If getStoriesByProject is async, await it
+      const stories = await StoryService.getStoriesByProject(activeProject.id);
+      setStories(stories);
+      // Fetch users for all story owners
+      const ownerIds = Array.from(new Set(stories.map(s => s.ownerId)));
+      const usersObj: { [key: string]: { firstName: string } } = {};
+      await Promise.all(ownerIds.map(async (id) => {
+        const user = await UserService.getUserById(id);
+        if (user) usersObj[id] = { firstName: user.firstName };
+      }));
+      setUsers(usersObj);
     } else {
       setStories([]);
+      setUsers({});
     }
   };
 
+
   useEffect(() => {
     // Load stories for the initial active project
-    loadStoriesForActiveProject();
+    const fetchStories = async () => {
+      await loadStoriesForActiveProject();
+    };
+    fetchStories();
 
     // Subscribe to active project changes
-    const handleProjectChange = () => loadStoriesForActiveProject();
+    const handleProjectChange = () => {
+      fetchStories();
+    };
     ProjectService.subscribe(handleProjectChange);
 
     // Cleanup subscription on unmount
@@ -77,7 +94,8 @@ const StoryList: React.FC = () => {
       StoryService.addStory(story);
     }
 
-    setStories(StoryService.getStoriesByProject(activeProject.id));
+    const updatedStories = await StoryService.getStoriesByProject(activeProject.id);
+    setStories(updatedStories);
     setShowForm(false);
     setNewStory({ name: "", description: "", priority: "low", state: "todo" });
     setEditingStory(null);
@@ -94,11 +112,12 @@ const StoryList: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleDeleteStory = (id: string) => {
-    StoryService.deleteStory(id);
+  const handleDeleteStory = async (id: string) => {
+    await StoryService.deleteStory(id);
     const activeProject = ProjectService.getActiveProject();
     if (activeProject) {
-      setStories(StoryService.getStoriesByProject(activeProject.id));
+      const updatedStories = await StoryService.getStoriesByProject(activeProject.id);
+      setStories(updatedStories);
     }
   };
 
@@ -248,7 +267,7 @@ const StoryList: React.FC = () => {
                 </span>
                 <span>
                   <i className="bi bi-person me-1"></i>
-                  Owner: {UserService.getUserById(story.ownerId)?.firstName || "Unknown"}
+                  Owner: {users[story.ownerId]?.firstName || "Unknown"}
                 </span>
               </div>
             </div>

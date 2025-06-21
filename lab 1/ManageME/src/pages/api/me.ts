@@ -15,6 +15,8 @@ const user: User = {
   email: "admin@example.com",
 };
 
+console.log(user.passwordHash)
+
 const JWT_SECRET = "your_jwt_secret";
 
 export const GET: APIRoute = async ({ cookies }) => {

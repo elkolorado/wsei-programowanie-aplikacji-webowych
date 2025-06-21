@@ -1,49 +1,47 @@
 import type { Task } from "../models/Task";
 import { ApiService } from "./ApiService";
 
-
-
 export class TaskService extends ApiService<Task> {
   private static instance: TaskService = new TaskService();
   private static listeners: ((project: TaskService | null) => void)[] = [];
 
   private constructor() {
-    super("manage-me-tasks");
+    super("tasks");
   }
 
   // Static method to get all tasks for the current project
-  static getAllTasks(): Task[] {
-    return this.instance.getAll();
+  static async getAllTasks(): Promise<Task[]> {
+    return await this.instance.getAll();
   }
 
   // Static method to get tasks by project
-  static getTasksByProject(projectId: string): Task[] {
-    return this.getAllTasks().filter((task) => task.projectId === projectId);
+  static async getTasksByProject(projectId: string): Promise<Task[]> {
+    const tasks = await this.getAllTasks();
+    return tasks.filter((task) => task.projectId === projectId);
   }
 
   // Static method to get tasks by story
-  static getTasksByStory(storyId: string): Task[] {
-    return this.getAllTasks().filter((task) => task.storyId === storyId);
+  static async getTasksByStory(storyId: string): Promise<Task[]> {
+    const tasks = await this.getAllTasks();
+    return tasks.filter((task) => task.storyId === storyId);
   }
 
   // Static method to add a task
-  static addTask(task: Task): void {
-    this.instance.add(task);
+  static async addTask(task: Task): Promise<void> {
+    await this.instance.add(task);
     this.notifyListeners();
   }
 
   // Static method to update a task
-  static updateTask(updatedTask: Task): void {
-    this.instance.update(updatedTask, (task) => task.id === updatedTask.id);
+  static async updateTask(updatedTask: Task): Promise<void> {
+    await this.instance.update(updatedTask.id, updatedTask);
     this.notifyListeners();
-
   }
 
   // Static method to delete a task
-  static deleteTask(id: string): void {
-    this.instance.delete((task) => task.id === id);
+  static async deleteTask(id: string): Promise<void> {
+    await this.instance.delete(id);
     this.notifyListeners();
-
   }
 
   // Subscribe to changes in the task service
@@ -60,6 +58,4 @@ export class TaskService extends ApiService<Task> {
   static notifyListeners(): void {
     this.listeners.forEach((listener) => listener(this.instance));
   }
-
-
 }

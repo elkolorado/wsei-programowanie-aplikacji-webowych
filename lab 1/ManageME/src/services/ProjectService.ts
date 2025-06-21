@@ -8,44 +8,41 @@ export class ProjectService extends ApiService<Project> {
   private static listeners: ((project: Project | null) => void)[] = [];
 
   private constructor() {
-    super("manage-me-projects");
+    super("projects");
   }
 
   // Static method to get all projects
-  static getAllProjects(): Project[] {
-    return this.instance.getAll();
+  static async getAllProjects(): Promise<Project[]> {
+    return await this.instance.getAll();
   }
 
   // Static method to add a project
-  static addProject(project: Project): void {
-    this.instance.add(project);
+  static async addProject(project: Project): Promise<void> {
+    await this.instance.add(project);
     this.setActiveProject(project);
     this.notifyListeners();
   }
 
   // Static method to update a project
-  static updateProject(updatedProject: Project): void {
-    this.instance.update(updatedProject, (project) => project.id === updatedProject.id);
+  static async updateProject(updatedProject: Project): Promise<void> {
+    await this.instance.update(updatedProject.id, updatedProject);
     this.notifyListeners();
-
   }
 
   // Static method to delete a project
-  static deleteProject(id: string): void {
-    // relation
+  static async deleteProject(id: string): Promise<void> {
     console.log("Deleting project with ID:", id);
-    const stories = StoryService.getStoriesByProject(id);
+    const stories = await StoryService.getStoriesByProject(id);
     console.log("Found stories for project:", stories);
-    stories.forEach(story => {
-      StoryService.deleteStory(story.id);
-    });
-    this.instance.delete((project) => project.id === id);
+    for (const story of stories) {
+      await StoryService.deleteStory(story.id);
+    }
+    await this.instance.delete(id);
     if (this.activeProject && this.activeProject.id === id) {
       this.activeProject = null; // Clear active project if deleted
       localStorage.removeItem("active-project");
     }
     this.notifyListeners();
-
   }
 
   // Set the active project and notify listeners

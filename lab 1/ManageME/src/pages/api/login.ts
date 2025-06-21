@@ -1,22 +1,21 @@
 import type { APIRoute } from "astro";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { MongoClient } from "mongodb";
 import type { User } from "../../models/User";
+import dotenv from "dotenv";
 
-export const prerender = false;
-// Example user (replace with DB lookup in real app)
-const user: User = {
-  id: "1",
-  login: "admin",
-  passwordHash: await bcrypt.hash("password123", 10), // store hash, not plain password
-  firstName: "Admin",
-  lastName: "User",
-  role: "admin",
-  email: "admin@example.com",
-};
+dotenv.config();
+const uri = process.env.MONGODB_URI || dotenv.config().parsed?.MONGODB_URI;
+if (!uri) {
+  throw new Error("MONGODB_URI environment variable is not set");
+}
+const client = new MongoClient(uri);
 
 const JWT_SECRET = "your_jwt_secret";
 const REFRESH_SECRET = "your_refresh_secret";
+
+export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
   let login = "";
@@ -33,8 +32,12 @@ export const POST: APIRoute = async ({ request }) => {
     password = form.get("password")?.toString() || "";
   }
 
+  await client.connect();
+  const db = client.db("manageme");
+  const user = await db.collection("users").findOne<User>({ login });
+
   if (
-    login !== user.login ||
+    !user ||
     !user.passwordHash ||
     !(await bcrypt.compare(password, user.passwordHash))
   ) {

@@ -9,10 +9,13 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^9.2.2",
     "@astrojs/react": "^4.2.2",
     "astro": "^5.4.1",
     "bcryptjs": "^3.0.2",
+    "dotenv": "^16.5.0",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.17.0",
     "nanostores": "^0.11.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"

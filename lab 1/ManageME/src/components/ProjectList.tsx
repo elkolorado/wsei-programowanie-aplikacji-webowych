@@ -15,28 +15,39 @@ const ProjectList: React.FC = () => {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   useEffect(() => {
-    const storedProjects = ProjectService.getAllProjects();
-    setProjects(storedProjects);
-    const active = ProjectService.getActiveProject?.();
-    setActiveProjectId(active?.id ?? null);
-    setIsLoading(false);
+    let isMounted = true;
+
+    const fetchProjects = async () => {
+      const storedProjects = await ProjectService.getAllProjects();
+      if (isMounted) setProjects(storedProjects);
+      const active = await ProjectService.getActiveProject?.();
+      if (isMounted) setActiveProjectId(active?.id ?? null);
+      if (isMounted) setIsLoading(false);
+    };
+
+    fetchProjects();
 
     // Subscribe to project changes
-    const handleProjectChange = () => {
-      const updatedProjects = ProjectService.getAllProjects();
-      setProjects(updatedProjects);
+    const handleProjectChange = async () => {
+      const updatedProjects = await ProjectService.getAllProjects();
+      if (isMounted) setProjects(updatedProjects);
       const activeProject = ProjectService.getActiveProject();
-      setActiveProjectId(activeProject?.id ?? null);
-    }
+      if (isMounted) setActiveProjectId(activeProject?.id ?? null);
+    };
     ProjectService.subscribe(handleProjectChange);
+
+    return () => {
+      isMounted = false;
+      ProjectService.unsubscribe?.(handleProjectChange);
+    };
   }, []);
 
-  const deleteProject = (id: string) => {
-    ProjectService.deleteProject(id);
+  const deleteProject = async (id: string) => {
+    await ProjectService.deleteProject(id);
     if (activeProjectId === id) setActiveProjectId(null);
   };
 
-  const handleSetActive = (project: Project) => {
+  const handleSetActive = async (project: Project) => {
     ProjectService.setActiveProject(project);
   };
 

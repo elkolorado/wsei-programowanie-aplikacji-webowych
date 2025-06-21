@@ -1,51 +1,49 @@
 export abstract class ApiService<T> {
-    private storageKey: string;
-  
-    constructor(storageKey: string) {
-      this.storageKey = storageKey;
-    }
-  
-    // Get all items from localStorage
-    protected getAll(): T[] {
-      const data = localStorage.getItem(this.storageKey);
-      return data ? JSON.parse(data) : [];
-    }
+  private endpoint: string;
 
-    // Get a single item by its ID
-    protected getById(id: string): T | null {
-      const items = this.getAll();
-      const found = items.find((item: any) => item.id === id);
-      return found !== undefined ? found : null;
-    }
-  
-    // Save all items to localStorage
-    protected saveAll(items: T[]): void {
-      localStorage.setItem(this.storageKey, JSON.stringify(items));
-    }
-  
-    // Add a new item
-    add(item: T): void {
-      const items = this.getAll();
-      items.push(item);
-      this.saveAll(items);
-    }
-  
-    // Update an existing item
-    update(updatedItem: T, matchFn: (item: T) => boolean): void {
-      const items = this.getAll().map((item) =>
-        matchFn(item) ? updatedItem : item
-      );
-      this.saveAll(items);
-    }
-  
-    // Delete an item
-    delete(matchFn: (item: T) => boolean): void {
-      const items = this.getAll().filter((item) => !matchFn(item));
-      this.saveAll(items);
-    }
-  
-    // Find an item by a condition
-    find(matchFn: (item: T) => boolean): T | undefined {
-      return this.getAll().find(matchFn);
-    }
+  constructor(endpoint: string) {
+    this.endpoint = endpoint;
   }
+
+  protected async getAll(): Promise<T[]> {
+    const res = await fetch(`/api/${this.endpoint}`, { credentials: "include" });
+    if (!res.ok) throw new Error(`Failed to fetch ${this.endpoint}`);
+    return await res.json();
+  }
+
+  protected async getById(id: string): Promise<T | null> {
+    const res = await fetch(`/api/${this.endpoint}/${id}`, { credentials: "include" });
+    if (!res.ok) return null;
+    return await res.json();
+  }
+
+  protected async add(item: T): Promise<T> {
+    const res = await fetch(`/api/${this.endpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(item),
+    });
+    if (!res.ok) throw new Error(`Failed to add to ${this.endpoint}`);
+    return await res.json();
+  }
+
+  protected async update(id: string, updatedItem: Partial<T>): Promise<T> {
+    const res = await fetch(`/api/${this.endpoint}/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(updatedItem),
+    });
+    if (!res.ok) throw new Error(`Failed to update ${this.endpoint}`);
+    return await res.json();
+  }
+
+  protected async delete(id: string): Promise<void> {
+    const res = await fetch(`/api/${this.endpoint}/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (!res.ok) throw new Error(`Failed to delete from ${this.endpoint}`);
+  }
+}

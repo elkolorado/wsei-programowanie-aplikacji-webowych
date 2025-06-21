@@ -6,41 +6,33 @@ export class UserService extends ApiService<User> {
   private static loggedInUser: User | null = null;
 
   private constructor() {
-    super("manage-me-users");
+    super("users");
   }
 
   // Static method to get all users
-  static getAllUsers(): User[] {
-    return this.instance.getAll();
+  static async getAllUsers(): Promise<User[]> {
+    return await this.instance.getAll();
   }
 
   // Static method to get a user by ID
-  static getUserById(id: string): User | null {
-    return this.instance.getById(id);
+  static async getUserById(id: string): Promise<User | null> {
+    return await this.instance.getById(id);
   }
 
 
   // Static method to add a user
-  static addUser(user: User): void {
-    this.instance.add(user);
+  static async addUser(user: User): Promise<void> {
+    await this.instance.add(user);
   }
 
   // Static method to update a user
-  static updateUser(updatedUser: User): void {
-    this.instance.update(updatedUser, (user) => user.id === updatedUser.id);
+  static async updateUser(updatedUser: User): Promise<void> {
+    await this.instance.update(updatedUser.id, updatedUser);
   }
 
   // Static method to delete a user
-  static deleteUser(id: string): void {
-    this.instance.delete((user) => user.id === id);
-  }
-
-  // Static method to set the logged-in user
-  static setLoggedInUser(user: User): void {
-    this.loggedInUser = user;
-    if (typeof window !== "undefined" && window.localStorage) {
-      localStorage.setItem("logged-in-user", JSON.stringify(user));
-    }
+  static async deleteUser(id: string): Promise<void> {
+    await this.instance.delete(id);
   }
 
   // Static method to get the logged-in user
@@ -52,18 +44,5 @@ export class UserService extends ApiService<User> {
     } catch {
       return null;
     }
-  }
-
-  // Static method to mock a list of users
-  static mockUsers(): void {
-    const users: User[] = [
-      { id: "1", firstName: "John", lastName: "Doe", role: "admin" },
-      { id: "2", firstName: "Jane", lastName: "Smith", role: "developer" },
-      { id: "3", firstName: "Alice", lastName: "Johnson", role: "devops" },
-    ];
-    this.instance.saveAll(users);
-
-    // Set the logged-in user as the admin
-    // this.setLoggedInUser(users[0]);
   }
 }

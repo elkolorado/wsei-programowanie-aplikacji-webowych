@@ -8,42 +8,42 @@ export class StoryService extends ApiService<Story> {
   private static instance: StoryService = new StoryService();
 
   private constructor() {
-    super("manage-me-stories");
+    super("stories");
   }
 
   // Static method to get all stories
-  static getAllStories(): Story[] {
-    return this.instance.getAll();
+  static async getAllStories(): Promise<Story[]> {
+    return await this.instance.getAll();
   }
 
   // Static method to get stories by project
-  static getStoriesByProject(projectId: string): Story[] {
-    return this.getAllStories().filter((story) => story.projectId === projectId);
+  static async getStoriesByProject(projectId: string): Promise<Story[]> {
+    return (await this.getAllStories()).filter((story) => story.projectId === projectId);
   }
 
   // Static method to add a story
-  static addStory(story: Story): void {
-    this.instance.add(story);
-    this.notifyListeners();
+  static async addStory(story: Story): Promise<void> {
+    await this.instance.add(story);
+    await this.notifyListeners();
   }
 
   // Static method to update a story
-  static updateStory(updatedStory: Story): void {
-    this.instance.update(updatedStory, (story) => story.id === updatedStory.id);
-    this.notifyListeners();
+  static async updateStory(updatedStory: Story): Promise<void> {
+    await this.instance.update(updatedStory.id, updatedStory);
+    await this.notifyListeners();
   }
 
   // Static method to delete a story
-  static deleteStory(id: string): void {
+  static async deleteStory(id: string): Promise<void> {
 
     // relation
-    const tasks = TaskService.getTasksByStory(id);
-    tasks.forEach(task => {
+    const tasks = await TaskService.getTasksByStory(id);
+    for (const task of tasks) {
       TaskService.deleteTask(task.id);
-    });
-    this.instance.delete((story) => story.id === id);
+    }
+    await this.instance.delete(id);
 
-    this.notifyListeners();
+    await this.notifyListeners();
   }
 
   private static listeners: Array<(stories: Story[]) => void> = [];
@@ -59,7 +59,8 @@ export class StoryService extends ApiService<Story> {
   }
 
   // Notify all listeners about stories change
-  static notifyListeners(): void {
-    this.listeners.forEach((listener) => listener(this.getAllStories()));
+  static async notifyListeners(): Promise<void> {
+    const stories = await this.getAllStories();
+    this.listeners.forEach((listener) => listener(stories));
   }
 }

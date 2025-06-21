@@ -15,9 +15,17 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
   const [state, setState] = useState(task.state);
   const [isEditing, setIsEditing] = useState(false);
   const [editTask, setEditTask] = useState<Partial<Task>>(task);
-  const users = UserService.getAllUsers().filter(
-    (user) => user.role === "developer" || user.role === "devops"
-  );
+  const [users, setUsers] = useState<{ id: string; firstName: string; lastName: string; role: string }[]>([]);
+
+  React.useEffect(() => {
+    const fetchUsers = async () => {
+      const allUsers = await UserService.getAllUsers();
+      setUsers(allUsers.filter(
+        (user) => user.role === "developer" || user.role === "devops"
+      ));
+    };
+    fetchUsers();
+  }, []);
 
   const handleAssignUser = () => {
     if (!assignedUserId) return;
@@ -41,7 +49,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
     };
     TaskService.updateTask(updatedTask);
     setIsEditing(false);
-    
+
   };
 
   const handleMarkAsDone = () => {
@@ -62,7 +70,17 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
     }
   };
 
-  const story = StoryService.getAllStories().find((s) => s.id === task.storyId);
+  const [story, setStory] = useState<{ id: string; name: string } | undefined>(undefined);
+  const [stories, setStories] = useState<{ id: string; name: string }[]>([]);
+
+  React.useEffect(() => {
+    const fetchStories = async () => {
+      const allStories = await StoryService.getAllStories();
+      setStories(allStories);
+      setStory(allStories.find((s: any) => s.id === task.storyId));
+    };
+    fetchStories();
+  }, [task.storyId]);
 
   if (isEditing) {
     return (
@@ -96,21 +114,21 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
-          </select>
-        </div>
-        <div className="mb-2">
-          <label>Story:</label>
-          <select
-            className="form-select"
-            value={editTask.storyId}
-            onChange={e => setEditTask({ ...editTask, storyId: e.target.value })}
-          >
-            <option value="">Select a story</option>
-            {StoryService.getAllStories().map(story => (
-              <option key={story.id} value={story.id}>
-                {story.name}
-              </option>
-            ))}
+            <div className="mb-2">
+              <label>Story:</label>
+              <select
+                className="form-select"
+                value={editTask.storyId}
+                onChange={e => setEditTask({ ...editTask, storyId: e.target.value })}
+              >
+                <option value="">Select a story</option>
+                {stories.map((story) => (
+                  <option key={story.id} value={story.id}>
+                    {story.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </select>
         </div>
 
@@ -197,7 +215,9 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
         <li className="list-group-item">
           <strong>Assigned User:</strong>{" "}
           {task.assignedUserId
-            ? UserService.getAllUsers().find((u) => u.id === task.assignedUserId)?.firstName
+            ? users.find((u) => u.id === task.assignedUserId)
+              ? `${users.find((u) => u.id === task.assignedUserId)?.firstName} ${users.find((u) => u.id === task.assignedUserId)?.lastName}`
+              : <span className="text-muted">Unknown user</span>
             : <span className="text-muted">Not assigned</span>}
         </li>
       </ul>
