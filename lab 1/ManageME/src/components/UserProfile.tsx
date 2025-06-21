@@ -8,6 +8,8 @@ const UserProfile: React.FC = () => {
     const { logout } = useAuth();
 
     React.useEffect(() => {
+        UserService.mockUsers();
+
         UserService.getLoggedInUser().then(setUser);
     }, []);
 

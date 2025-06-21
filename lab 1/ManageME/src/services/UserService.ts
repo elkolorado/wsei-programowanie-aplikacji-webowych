@@ -44,7 +44,7 @@ export class UserService extends ApiService<User> {
   }
 
   // Static method to get the logged-in user
-  static async getLoggedInUser(token: string): Promise<User | null> {
+  static async getLoggedInUser(): Promise<User | null> {
     try {
       const res = await fetch("/api/me", { credentials: "include" });
       if (!res.ok) return null;

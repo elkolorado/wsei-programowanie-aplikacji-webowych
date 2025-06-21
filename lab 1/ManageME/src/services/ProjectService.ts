@@ -40,6 +40,10 @@ export class ProjectService extends ApiService<Project> {
       StoryService.deleteStory(story.id);
     });
     this.instance.delete((project) => project.id === id);
+    if (this.activeProject && this.activeProject.id === id) {
+      this.activeProject = null; // Clear active project if deleted
+      localStorage.removeItem("active-project");
+    }
     this.notifyListeners();
 
   }

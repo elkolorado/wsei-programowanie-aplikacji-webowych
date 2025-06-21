@@ -7,6 +7,7 @@ import Modal from "./Modal";
 import { ProjectService } from "../services/ProjectService";
 import { UserService } from "../services/UserService";
 import TaskCard from "./TaskCard";
+import { task } from "nanostores";
 
 const KanbanBoard: React.FC = () => {
   const [modal, setModal] = useState(false);
@@ -55,8 +56,19 @@ const KanbanBoard: React.FC = () => {
       const updatedTask: Task = {
         ...task,
         state: newState,
-        ...(newState === "doing" && !task.startDate ? { startDate: new Date().toISOString() } : {}),
-        ...(newState === "done" && !task.endDate ? { endDate: new Date().toISOString() } : {}),
+        ...(newState === "todo"
+          ? { startDate: undefined, endDate: undefined }
+          : newState === "doing"
+            ? {
+              startDate: task.startDate ?? new Date().toISOString(),
+              endDate: undefined
+            }
+            : newState === "done"
+              ? {
+                startDate: task.startDate ?? new Date().toISOString(),
+                endDate: task.endDate ?? new Date().toISOString()
+              }
+              : {}),
       };
       TaskService.updateTask(updatedTask);
       setTasks(TaskService.getAllTasks());
@@ -103,9 +115,11 @@ const KanbanBoard: React.FC = () => {
     </div>
   );
 
+
+
   return (
     <div className="kanban-board mt-5">
-      <div className="d-flex">
+      <div className="d-flex mb-4">
         <h2>Kanban Board</h2>
         <button className="btn btn-primary ms-3" onClick={() => setModal(true)}>
           Add Task
@@ -133,7 +147,9 @@ const KanbanBoard: React.FC = () => {
         {renderColumn("doing")}
         {renderColumn("done")}
       </div>
-    </div >
+
+
+    </div>
   );
 };
 

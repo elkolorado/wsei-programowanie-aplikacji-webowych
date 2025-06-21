@@ -1,12 +1,10 @@
 ---
-import { AuthProvider } from "../context/AuthContext";
-import UserProfile from "./UserProfile.tsx";
 import UserProfileIsland from "./UserProfileIsland";
+import ThemeToggle from "./ThemeToggle.tsx"
 const links = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/projects", label: "Projects" },
-  { href: "/contact", label: "Contact" },
+  { href: "https://github.com/elkolorado/wsei-programowanie-aplikacji-webowych", label: "Github" },
+  { href: "mailto:vuuyadesign@gmail.com", label: "Contact" },
 ];
 ---
 
@@ -35,10 +33,15 @@ const links = [
             </li>
           ))
         }
+        <li class="nav-item">
+          <ThemeToggle client:load />
+        </li>
       </ul>
       <span class="navbar-text ms-3">
-        <UserProfileIsland client:load/>
+        <UserProfileIsland client:load />
       </span>
     </div>
   </div>
 </nav>
+
+<!-- Replace the theme toggle button in your navbar with: -->

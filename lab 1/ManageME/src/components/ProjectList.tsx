@@ -56,9 +56,13 @@ const ProjectList: React.FC = () => {
         )}
       </Modal>
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <Button onClick={() => setShowNewModal(true)} className="btn btn-primary">
-          Add Project
-        </Button>
+        <div className="d-flex">
+
+          <h3>Projects</h3>
+          <Button onClick={() => setShowNewModal(true)} className="btn btn-primary ms-3">
+            Add Project
+          </Button>
+        </div>
       </div>
       <ul className="list-group">
         {isLoading ? (
@@ -74,6 +78,8 @@ const ProjectList: React.FC = () => {
             <li
               key={project.id}
               className={`list-group-item mb-2${activeProjectId === project.id ? " border-primary border-3" : ""}`}
+              onClick={() => handleSetActive(project)}
+              role="button"
               style={activeProjectId === project.id ? { border: "2px solid #0d6efd" } : {}}
             >
               <div className="d-flex justify-content-between align-items-center">
@@ -91,7 +97,7 @@ const ProjectList: React.FC = () => {
                   <Button
                     onClick={() => { setEditingProject(project); setShowEditModal(true); }
                     }
-                    className="btn btn-secondary btn-sm"
+                    className="btn btn-secondary btn-sm me-2"
                   >
                     Edit
                   </Button>

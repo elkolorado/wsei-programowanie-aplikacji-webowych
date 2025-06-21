@@ -44,7 +44,7 @@ const StoryList: React.FC = () => {
     };
   }, []);
 
-  const handleCreateOrUpdateStory = () => {
+  const handleCreateOrUpdateStory = async () => {
     const activeProject = ProjectService.getActiveProject();
     if (!activeProject) {
       alert("No active project selected!");
@@ -63,6 +63,7 @@ const StoryList: React.FC = () => {
       StoryService.updateStory(updatedStory);
     } else {
       // Create new story
+      const loggedInUser = await UserService.getLoggedInUser();
       const story: Story = {
         id: Date.now().toString(),
         name: storyDetails.name || "Untitled Story",
@@ -71,7 +72,7 @@ const StoryList: React.FC = () => {
         projectId: activeProject.id,
         createdAt: new Date().toISOString(),
         state: storyDetails.state as "todo" | "doing" | "done",
-        ownerId: UserService.getLoggedInUser()?.id || "default-user-id",
+        ownerId: loggedInUser?.id || "default-user-id",
       };
       StoryService.addStory(story);
     }
@@ -109,7 +110,7 @@ const StoryList: React.FC = () => {
   if (!activeProject) {
     return (
       <div className="alert alert-warning">
-        Please select a project to view and manage stories.
+        Please select a project to view and manage stories & tasks.
       </div>
     );
   }

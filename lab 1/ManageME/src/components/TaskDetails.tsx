@@ -162,7 +162,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
   }
 
   return (
-    <div className="">
+    <div className="card p-3">
       <h3 className="card-title mb-3">Task Details</h3>
       <ul className="list-group list-group-flush mb-3">
         <li className="list-group-item">
@@ -181,13 +181,18 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
           <strong>Estimated Hours:</strong> {task.estimatedHours}
         </li>
         <li className="list-group-item">
-          <strong>State:</strong> <span className={`badge bg-${state === "done" ? "success" : state === "doing" ? "primary" : "secondary"}`}>{state}</span>
+          <strong>State:</strong>{" "}
+          <span className={`badge bg-${state === "done" ? "success" : state === "doing" ? "primary" : "secondary"}`}>
+            {state}
+          </span>
         </li>
         <li className="list-group-item">
-          <strong>Start Date:</strong> {task.startDate || <span className="text-muted">Not started</span>}
+          <strong>Start Date:</strong>{" "}
+          {task.startDate || <span className="text-muted">Not started</span>}
         </li>
         <li className="list-group-item">
-          <strong>End Date:</strong> {task.endDate || <span className="text-muted">Not completed</span>}
+          <strong>End Date:</strong>{" "}
+          {task.endDate || <span className="text-muted">Not completed</span>}
         </li>
         <li className="list-group-item">
           <strong>Assigned User:</strong>{" "}
@@ -224,12 +229,14 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onClose }) => {
         </Button>
       )}
 
-      <Button onClick={() => setIsEditing(true)} className="btn btn-secondary w-100 mb-2">
-        Edit Task
-      </Button>
-      <Button onClick={handleDeleteTask} className="btn btn-danger w-100 mb-2">
-        Delete Task
-      </Button>
+      <div className="d-grid gap-2">
+        <Button onClick={() => setIsEditing(true)} className="btn btn-secondary mb-2">
+          Edit Task
+        </Button>
+        <Button onClick={handleDeleteTask} className="btn btn-danger mb-2">
+          Delete Task
+        </Button>
+      </div>
     </div>
   );
 };

@@ -21,7 +21,7 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} autoComplete="on" className="p-4 border rounded shadow-sm bg-white" style={{ maxWidth: 400, margin: "2rem auto" }}>
+    <form onSubmit={handleSubmit} autoComplete="on" className="p-4 border rounded shadow-sm" style={{ maxWidth: 400, margin: "2rem auto" }}>
       <h2 className="mb-4 text-center">Login</h2>
       {error && <div className="alert alert-danger">{error}</div>}
       <div className="mb-3">
