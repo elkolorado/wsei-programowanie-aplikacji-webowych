@@ -131,7 +131,7 @@ const KanbanBoard: React.FC = () => {
     <div className="kanban-board mt-5">
       <div className="d-flex mb-4">
         <h2>Kanban Board</h2>
-        <button className="btn btn-primary ms-3" onClick={() => setModal(true)}>
+        <button id="addTask" className="btn btn-primary ms-3" onClick={() => setModal(true)}>
           Add Task
         </button>
       </div>

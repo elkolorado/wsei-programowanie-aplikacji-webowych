@@ -19,7 +19,7 @@ const UserProfile: React.FC = () => {
         <div>
             {user ? (
                 <>
-                    Logged in as: {user.firstName} {user.lastName} ({user.role}){" "}
+                    Logged in as: <span id="loggedInUserFirstLastName">{user.firstName} {user.lastName}</span> ({user.role}){" "}
                     <button className="btn btn-sm btn-outline-danger ms-2" onClick={handleLogout}>
                         Logout
                     </button>

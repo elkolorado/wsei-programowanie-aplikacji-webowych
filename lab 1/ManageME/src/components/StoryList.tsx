@@ -139,9 +139,9 @@ const StoryList: React.FC = () => {
       <div className="d-flex justify-content-between align-items-center mb-3 mt-5">
         <div className="d-flex">
           <h3>Stories</h3>
-          <Button onClick={() => setShowForm(true)} className="btn btn-primary mb-3 ms-3">
+          <button onClick={() => setShowForm(true)} className="btn btn-primary mb-3 ms-3" id="createNewStory">
             Create New Story
-          </Button>
+          </button>
         </div>
         <div>
           <div className="d-flex gap-2" role="group" aria-label="Story state filter">
@@ -188,6 +188,7 @@ const StoryList: React.FC = () => {
             <input
               type="text"
               className="form-control"
+              name="name"
               value={storyDetails.name}
               onChange={(e) => setNewStory({ ...storyDetails, name: e.target.value })}
             />
@@ -196,6 +197,7 @@ const StoryList: React.FC = () => {
             <label>Description</label>
             <textarea
               className="form-control"
+              name="description"
               value={storyDetails.description}
               onChange={(e) => setNewStory({ ...storyDetails, description: e.target.value })}
             />
@@ -204,6 +206,7 @@ const StoryList: React.FC = () => {
             <label>Priority</label>
             <select
               className="form-select"
+              name="priority"
               value={storyDetails.priority}
               onChange={(e) => setNewStory({ ...storyDetails, priority: e.target.value as "low" | "medium" | "high" })}
             >
@@ -216,6 +219,7 @@ const StoryList: React.FC = () => {
             <label>State</label>
             <select
               className="form-select"
+              name="state"
               value={storyDetails.state}
               onChange={(e) => setNewStory({ ...storyDetails, state: e.target.value as "todo" | "doing" | "done" })}
             >

@@ -1,0 +1,104 @@
+# Page snapshot
+
+```yaml
+- navigation:
+  - link "ManageME":
+    - /url: /
+  - list:
+    - listitem:
+      - link "Home":
+        - /url: /
+    - listitem:
+      - link "Github":
+        - /url: https://github.com/elkolorado/wsei-programowanie-aplikacji-webowych
+    - listitem:
+      - button "Przełącz tryb": ☀️
+  - text: "Logged in as: Admin User (admin)"
+  - button "Logout"
+- main:
+  - heading "Projects" [level=3]
+  - button "Add Project"
+  - list:
+    - button "hello Delete Edit Set Active":
+      - heading "hello" [level=5]
+      - paragraph
+      - button "Delete"
+      - button "Edit"
+      - button "Set Active"
+    - button "Test Project This is a test project. Delete Edit Set Active":
+      - heading "Test Project" [level=5]
+      - paragraph: This is a test project.
+      - button "Delete"
+      - button "Edit"
+      - button "Set Active"
+  - heading "Stories" [level=3]
+  - button "Create New Story"
+  - group "Story state filter":
+    - button "All"
+    - button "Todo"
+    - button "Doing"
+    - button "Done"
+  - dialog:
+    - heading "Create New Story" [level=4]
+    - text: Name
+    - textbox: Test Story
+    - text: Description
+    - textbox: This is a test story.
+    - text: Priority
+    - combobox:
+      - option "Low"
+      - option "Medium" [selected]
+      - option "High"
+    - text: State
+    - combobox:
+      - option "Todo" [selected]
+      - option "Doing"
+      - option "Done"
+    - button "Save"
+    - button "Close"
+  - list:
+    - listitem:
+      - heading "hello1" [level=5]
+      - text: low todo
+      - paragraph
+      - text: "Created: 6/21/2025 Owner: Admin"
+      - button "Edit"
+      - button "Delete"
+    - listitem:
+      - heading "Test Story" [level=5]
+      - text: medium todo
+      - paragraph: This is a test story.
+      - text: "Created: 6/21/2025 Owner: Admin"
+      - button "Edit"
+      - button "Delete"
+    - listitem:
+      - heading "Test Story" [level=5]
+      - text: medium todo
+      - paragraph: This is a test story.
+      - text: "Created: 6/21/2025 Owner: Admin"
+      - button "Edit"
+      - button "Delete"
+    - listitem:
+      - heading "Test Story" [level=5]
+      - text: medium todo
+      - paragraph: This is a test story.
+      - text: "Created: 6/21/2025 Owner: Admin"
+      - button "Edit"
+      - button "Delete"
+    - listitem:
+      - heading "Test Story" [level=5]
+      - text: medium todo
+      - paragraph: This is a test story.
+      - text: "Created: 6/21/2025 Owner: Admin"
+      - button "Edit"
+      - button "Delete"
+  - heading "Kanban Board" [level=2]
+  - button "Add Task"
+  - heading "TODO" [level=4]
+  - text: JS
+  - heading "task 1" [level=5]
+  - paragraph
+  - text: low Not estimated
+  - heading "DOING" [level=4]
+  - heading "DONE" [level=4]
+```

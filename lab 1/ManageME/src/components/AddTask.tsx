@@ -77,6 +77,7 @@ const AddTaskForm: React.FC = () => {
         <input
           required
           type="text"
+          name="name"
           className="form-control"
           value={task.name}
           onChange={(e) => setTask({ ...task, name: e.target.value })}
@@ -87,6 +88,7 @@ const AddTaskForm: React.FC = () => {
         <label className="form-label">Description:</label>
         <textarea
           className="form-control"
+          name="description"
           value={task.description}
           onChange={(e) => setTask({ ...task, description: e.target.value })}
           placeholder="Enter task description"
@@ -96,6 +98,7 @@ const AddTaskForm: React.FC = () => {
         <label className="form-label">Priority:</label>
         <select
           className="form-select"
+          name="priority"
           value={task.priority}
           onChange={(e) => setTask({ ...task, priority: e.target.value as Task["priority"] })}
         >
@@ -108,6 +111,7 @@ const AddTaskForm: React.FC = () => {
         <label className="form-label">Story:</label>
         <select
           required
+          name="storyId"
           className="form-select"
           value={task.storyId}
           onChange={(e) => setTask({ ...task, storyId: e.target.value })}
@@ -125,6 +129,7 @@ const AddTaskForm: React.FC = () => {
         <input
           type="number"
           className="form-control"
+          name="estimatedHours"
           value={task.estimatedHours}
           onChange={(e) => setTask({ ...task, estimatedHours: parseInt(e.target.value, 10) })}
           min={0}

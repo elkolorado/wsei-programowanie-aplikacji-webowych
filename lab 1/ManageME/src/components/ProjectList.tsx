@@ -36,6 +36,13 @@ const ProjectList: React.FC = () => {
     };
     ProjectService.subscribe(handleProjectChange);
 
+    //always selec the first project as active if no active project is set
+    if (isMounted && projects.length > 0 && !activeProjectId) {
+      const firstProject = projects[0];
+      setActiveProjectId(firstProject.id);
+      ProjectService.setActiveProject(firstProject);
+    }
+
     return () => {
       isMounted = false;
       ProjectService.unsubscribe?.(handleProjectChange);
@@ -70,9 +77,9 @@ const ProjectList: React.FC = () => {
         <div className="d-flex">
 
           <h3>Projects</h3>
-          <Button onClick={() => setShowNewModal(true)} className="btn btn-primary ms-3">
+          <button onClick={() => setShowNewModal(true)} className="btn btn-primary ms-3" id="addProject">
             Add Project
-          </Button>
+          </button>
         </div>
       </div>
       <ul className="list-group">
